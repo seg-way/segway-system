@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "segway-system.destinations.fullname" . }}
+  labels:
+    {{- include "segway-system.destinations.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.destinations.service.type }}
+  ports:
+    - port: {{ .Values.destinations.service.port }}
+      targetPort: syslog-tcp
+      protocol: TCP
+      name: syslog-tcp
+  selector:
+    {{- include "segway-system.destinations.selectorLabels" . | nindent 4 }}

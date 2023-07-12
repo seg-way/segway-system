@@ -1,0 +1,32 @@
+{{- if .Values.logpaths.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "segway-system.logpaths.fullname" . }}
+  labels:
+    {{- include "segway-system.logpaths.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "segway-system.logpaths.fullname" . }}
+  minReplicas: {{ .Values.logpaths.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.logpaths.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.logpaths.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.logpaths.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.logpaths.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.logpaths.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}
